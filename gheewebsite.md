@@ -27,6 +27,33 @@ GheeRoots is a professional e-commerce website for GSR, a family-owned ghee busi
 
 ---
 
+## Repository Restructuring & Canonical Production Repo (2024-06)
+
+### Why the Split?
+Previously, the project was maintained in a monolithic repository (`Ghee_Website`) that included legacy code, a PostgreSQL backend (with Drizzle ORM), and all frontend assets. To improve maintainability, deployment, and to align with Supabase's free tier limits, the codebase was split:
+
+- **Frontend code (Vite + React + Tailwind)** is now isolated for easier deployment to Vercel.
+- **Database schema and migrations** are separated for direct use with Supabase (via SQL editor or CLI).
+- **Backend functions (Supabase Edge Functions)** are optional and can be added in the future.
+- **Legacy code and Drizzle ORM** are deprecated and not included in this repo.
+
+### New Structure: `Ghee_Website_Supabase`
+This repository is now the canonical, production-focused codebase. It contains only the essentials for modern deployment:
+
+- `client/` → Frontend (Vite + React + Tailwind)
+- `migrations/` → Database schema and migrations for Supabase
+- `supabase/` (optional) → For Supabase Edge Functions (future)
+- `.env.example` → Environment variable template
+- `gheewebsite.md` → Documentation (architecture, DB schema, setup)
+
+### Deployment Plan
+- **Backend:** Supabase (database migrations run via SQL editor or CLI; Edge Functions optional)
+- **Frontend:** Vercel (auto-builds from this repo)
+
+> **Note:** Treat `Ghee_Website_Supabase` as the canonical, production-focused repository for all future development, deployment, and documentation unless otherwise specified.
+
+---
+
 ## Major Features Added
 - **Product Showcase**: Displays all ghee products and their variants (250ml, 500ml, 1000ml) with images, prices, and size selection.
 - **Company Heritage Section**: Tells the story of GSR with a timeline and family values, now using local images.
