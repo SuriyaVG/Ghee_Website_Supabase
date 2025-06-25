@@ -1,17 +1,18 @@
-nfig.ts
-
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig({
-  base: './',
   plugins: [react()],
+  root: path.resolve(__dirname, "client"), 
+  build: {
+    outDir: path.resolve(__dirname, "dist"), 
+    emptyOutDir: true,
+  },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@shared': path.resolve(__dirname, './shared'),
+      '@': path.resolve(__dirname, "client/src"),
+      '@shared': path.resolve(__dirname, "shared"),
     },
   },
-  // NO build section needed. Vite's default is to build to 'dist'
 });
