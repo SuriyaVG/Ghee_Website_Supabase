@@ -12,7 +12,10 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: ['drizzle-orm/pg-core'],
+      external: [
+        'drizzle-orm',
+        'drizzle-orm/pg-core',
+      ],
     },
   },
 }); 
