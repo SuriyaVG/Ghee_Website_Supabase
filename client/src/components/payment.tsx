@@ -24,13 +24,16 @@ export function Payment({ items, total, customerInfo, onSuccess, onCancel }: Pay
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const [codError, setCodError] = useState<string | null>(null);
-  const [codOrderId, setCodOrderId] = useState<number | null>(null);
+  const [codOrderId, setCodOrderId] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
 
   const createOrderMutation = useMutation({
     mutationFn: async (orderData: any) => {
-      const { data, error } = await supabase.from('orders').insert(orderData).select().single();
-      if (error) throw new Error(error.message || 'Failed to create order');
+      const { data, error } = await supabase.rpc('create_order', orderData);
+      
+      if (error) {
+        throw new Error(error.message || 'Failed to create order via RPC');
+      }
       return data;
     },
   });
@@ -46,30 +49,30 @@ export function Payment({ items, total, customerInfo, onSuccess, onCancel }: Pay
     setCodError(null);
     setIsRetrying(false);
     try {
-      // Validate phone number format
       const phoneNumber = customerInfo.customerPhone.replace(/\D/g, '');
       const isValidIndianPhone = /^(\+?91)?[6-9]\d{9}$/.test(phoneNumber);
       if (!isValidIndianPhone) {
         throw new Error('Please enter a valid Indian phone number starting with 6-9 and having 10 digits.');
       }
 
-      const itemsForOrder = validItems.map(item => ({
-        productId: item.variant.id,
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-      }));
-      const orderData = {
-        ...customerInfo,
-        customerPhone: phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`,
-        items: itemsForOrder,
-        total: total.toString(),
-        status: 'pending',
-        paymentStatus: 'pending',
+      const rpcPayload = {
+        customer_name: customerInfo.customerName,
+        customer_email: customerInfo.customerEmail,
+        customer_phone: phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`,
+        total: total,
+        items: validItems.map(item => ({
+          product_id: item.variant.id,
+          product_name: item.name,
+          quantity: item.quantity,
+          price_per_item: item.price,
+        })),
       };
-      const order = await createOrderMutation.mutateAsync(orderData);
-      setCodOrderId(order.id);
-      window.location.href = `/payment-success?orderId=${order.id}`;
+
+      const newOrderId = await createOrderMutation.mutateAsync(rpcPayload);
+
+      setCodOrderId(newOrderId);
+      window.location.href = `/payment-success?orderId=${newOrderId}`;
+
     } catch (error: any) {
       setCodError(error?.message || 'Unable to place order. Please try again.');
     }

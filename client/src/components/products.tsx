@@ -16,10 +16,19 @@ export function Products() {
   const { data: productsData, isLoading, error } = useQuery<ProductWithVariants[]>({
     queryKey: ['products'],
     queryFn: async () => {
+      console.log('Attempting to fetch from products_with_variants...');
+
       const { data, error } = await supabase
         .from('products_with_variants')
         .select('*');
-      if (error) throw new Error(error.message);
+      
+      if (error) {
+        console.error('Supabase query error:', error);
+        throw new Error(error.message);
+      }
+      
+      console.log('Supabase query successful. Raw data received:', data);
+
       return data as ProductWithVariants[];
     },
   });
