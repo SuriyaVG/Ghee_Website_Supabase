@@ -15,6 +15,7 @@ export default defineConfig({
       external: [
         'drizzle-orm',
         'drizzle-orm/pg-core',
+        'drizzle-zod',
       ],
     },
   },
