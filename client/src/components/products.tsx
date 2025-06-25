@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCartStore, type CartItem } from '@/lib/store';
 import { useToast } from '@/hooks/use-toast';
-import type { ProductWithVariants, ProductVariant } from '@shared/schema';
+import type { ProductWithVariants, ProductVariant } from '@/shared/schema';
 import { useState } from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';

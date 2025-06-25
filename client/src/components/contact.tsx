@@ -8,9 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import type { InsertContact } from '@shared/schema';
+import type { InsertContact } from '@/shared/schema';
 import { useZodForm } from '@/hooks/use-zod-form';
-import { insertContactSchema } from '@shared/schemas/contacts';
+import { insertContactSchema } from '@/shared/schemas/contacts';
 
 export function Contact() {
   const { toast } = useToast();

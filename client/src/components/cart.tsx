@@ -11,7 +11,7 @@ import { useCartStore } from '@/lib/store';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { Payment } from './payment';
-import type { InsertOrder } from '@shared/schema';
+import type { InsertOrder } from '@/shared/schema';
 
 interface CartProps {
   isOpen: boolean;

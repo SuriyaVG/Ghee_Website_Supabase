@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import type { ProductWithVariants, ProductVariant } from '@shared/schema';
+import type { ProductWithVariants, ProductVariant } from '@/shared/schema';
 import { useNavigate, Link } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { supabase } from '@/lib/supabaseClient';
