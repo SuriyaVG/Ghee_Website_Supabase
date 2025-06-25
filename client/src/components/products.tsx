@@ -112,97 +112,101 @@ export function Products() {
         </div>
 
         <div className="max-w-lg mx-auto grid grid-cols-1 gap-12 mb-16">
-          {productsData?.map((product) => {
-            const currentSelectedVariantId =
-              selectedVariants[product.id] || product.variants[0]?.id;
-            const currentVariant = product.variants.find((v) => v.id === currentSelectedVariantId);
-            const displayImage =
-              (currentVariant?.image_url?.replace(/\.jpg$/, '.webp') ||
-              product.variants[0]?.image_url?.replace(/\.jpg$/, '.webp') ||
-              '/placeholder-image.webp');
-            const displayPrice = currentVariant?.price || product.variants[0]?.price || '0.00';
+          {productsData
+            ?.filter(p => p.variants && Array.isArray(p.variants) && p.variants.length > 0)
+            .map((product) => {
+              const currentSelectedVariantId =
+                selectedVariants[product.id] || product.variants[0].id;
 
-            return (
-              <Card
-                key={product.id}
-                className="bg-card shadow-lg hover:shadow-xl transition-all duration-300 border border-border/60 group flex flex-col"
-              >
-                <CardContent className="p-6 flex flex-col flex-grow">
-                  <div className="relative mb-6">
-                    <Image
-                      src={displayImage}
-                      alt={product.name}
-                      className="w-full h-56 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                    {/* {product.is_popular && (
-                      <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground font-semibold">
-                        Popular
-                      </Badge>
-                    )} */}
-                    {currentVariant?.best_value_badge && (
-                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-                        {currentVariant.best_value_badge}
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-3 flex flex-col flex-grow">
-                    <h3 className="text-2xl font-playfair font-bold text-foreground">
-                      {product.name}
-                    </h3>
-                    <p className="text-muted-foreground text-sm flex-grow">{product.description}</p>
+              const currentVariant = product.variants.find((v) => v.id === currentSelectedVariantId) || product.variants[0];
 
-                    <div className="mt-4 mb-2">
-                      <Label className="text-md font-medium text-foreground mb-2 block">
-                        Select Size:
-                      </Label>
-                      <RadioGroup
-                        defaultValue={currentSelectedVariantId}
-                        onValueChange={(value) => handleVariantChange(product.id, value)}
-                        className="flex space-x-3"
-                      >
-                        {product.variants.map((variant) => (
-                          <Label
-                            key={variant.id}
-                            htmlFor={`variant-${product.id}-${variant.id}`}
-                            className={`flex items-center justify-center px-4 py-2 border rounded-lg cursor-pointer text-sm font-medium 
-                                        ${
-                                          currentSelectedVariantId === variant.id
-                                            ? 'bg-primary text-primary-foreground border-primary'
-                                            : 'bg-background text-foreground border-border hover:border-primary hover:bg-accent hover:text-accent-foreground'
-                                        }`}
-                          >
-                            <RadioGroupItem
-                              value={variant.id}
-                              id={`variant-${product.id}-${variant.id}`}
-                              className="sr-only"
-                            />
-                            {variant.size}
-                          </Label>
-                        ))}
-                      </RadioGroup>
-                    </div>
+              const displayImage =
+                (currentVariant?.image_url?.replace(/\.jpg$/, '.webp') ||
+                '/placeholder-image.webp');
+              
+              const displayPrice = currentVariant?.price ? parseFloat(currentVariant.price as any).toFixed(2) : '0.00';
 
-                    <div className="flex items-center justify-between pt-2">
-                      <div className="text-3xl font-playfair font-bold text-primary">
-                        ₹{displayPrice}
-                      </div>
-                      {currentVariant && (
-                        <div className="text-sm text-muted-foreground">for {currentVariant.size}</div>
+              return (
+                <Card
+                  key={product.id}
+                  className="bg-card shadow-lg hover:shadow-xl transition-all duration-300 border border-border/60 group flex flex-col"
+                >
+                  <CardContent className="p-6 flex flex-col flex-grow">
+                    <div className="relative mb-6">
+                      <Image
+                        src={displayImage}
+                        alt={product.name}
+                        className="w-full h-56 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                      {/* {product.is_popular && (
+                        <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground font-semibold">
+                          Popular
+                        </Badge>
+                      )} */}
+                      {currentVariant?.best_value_badge && (
+                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                          {currentVariant.best_value_badge}
+                        </div>
                       )}
                     </div>
-                  </div>
-                  <Button
-                    onClick={() => handleAddToCart(product, currentSelectedVariantId)}
-                    className="w-full mt-auto bg-primary text-primary-foreground hover:bg-primary/90 transition-colors py-3"
-                  >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Add to Cart
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
+                    <div className="space-y-3 flex flex-col flex-grow">
+                      <h3 className="text-2xl font-playfair font-bold text-foreground">
+                        {product.name}
+                      </h3>
+                      <p className="text-muted-foreground text-sm flex-grow">{product.description}</p>
+
+                      <div className="mt-4 mb-2">
+                        <Label className="text-md font-medium text-foreground mb-2 block">
+                          Select Size:
+                        </Label>
+                        <RadioGroup
+                          defaultValue={currentSelectedVariantId}
+                          onValueChange={(value) => handleVariantChange(product.id, value)}
+                          className="flex space-x-3"
+                        >
+                          {product.variants.map((variant) => (
+                            <Label
+                              key={variant.id}
+                              htmlFor={`variant-${product.id}-${variant.id}`}
+                              className={`flex items-center justify-center px-4 py-2 border rounded-lg cursor-pointer text-sm font-medium 
+                                          ${
+                                            currentSelectedVariantId === variant.id
+                                              ? 'bg-primary text-primary-foreground border-primary'
+                                              : 'bg-background text-foreground border-border hover:border-primary hover:bg-accent hover:text-accent-foreground'
+                                          }`}
+                            >
+                              <RadioGroupItem
+                                value={variant.id}
+                                id={`variant-${product.id}-${variant.id}`}
+                                className="sr-only"
+                              />
+                              {variant.size}
+                            </Label>
+                          ))}
+                        </RadioGroup>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2">
+                        <div className="text-3xl font-playfair font-bold text-primary">
+                          ₹{displayPrice}
+                        </div>
+                        {currentVariant && (
+                          <div className="text-sm text-muted-foreground">for {currentVariant.size}</div>
+                        )}
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => handleAddToCart(product, currentSelectedVariantId)}
+                      className="w-full mt-auto bg-primary text-primary-foreground hover:bg-primary/90 transition-colors py-3"
+                    >
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      Add to Cart
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
         </div>
 
         <div className="bg-secondary/20 rounded-2xl p-8">
