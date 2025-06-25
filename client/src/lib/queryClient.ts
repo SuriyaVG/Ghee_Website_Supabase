@@ -13,3 +13,25 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+// Reusable API request helper
+export async function apiRequest(
+  method: string,
+  url: string,
+  data?: any,
+  options: RequestInit = {}
+) {
+  const fetchOptions: RequestInit = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+    ...options,
+  };
+  if (data) {
+    fetchOptions.body = JSON.stringify(data);
+  }
+  const response = await fetch(url, fetchOptions);
+  return response;
+}
