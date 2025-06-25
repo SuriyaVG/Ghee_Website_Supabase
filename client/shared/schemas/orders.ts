@@ -79,4 +79,23 @@ export const insertOrderItemSchema = createInsertSchema(orderItems).omit({
 });
 
 export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
-export type OrderItem = typeof orderItems.$inferSelect; 
+export type OrderItem = typeof orderItems.$inferSelect;
+
+export const orderSchema = z.object({
+  id: z.number().optional(),
+  customerName: z.string(),
+  customerEmail: z.string().email(),
+  customerPhone: z.string(),
+  items: z.array(z.object({
+    productId: z.number(),
+    name: z.string(),
+    quantity: z.number(),
+    price: z.number(),
+  })),
+  total: z.string(),
+  status: z.string(),
+  paymentStatus: z.string(),
+});
+
+export type Order = z.infer<typeof orderSchema>;
+export type InsertOrder = Omit<Order, 'id'>; 

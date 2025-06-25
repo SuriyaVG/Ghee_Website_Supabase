@@ -7,10 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
-import type { InsertContact } from '@/shared/schema';
+import type { InsertContact } from '@shared/schema';
 import { useZodForm } from '@/hooks/use-zod-form';
-import { insertContactSchema } from '@/shared/schemas/contacts';
+import { insertContactSchema } from '@shared/schemas/contacts';
+import { supabase } from '@/lib/supabaseClient';
 
 export function Contact() {
   const { toast } = useToast();
@@ -28,12 +28,9 @@ export function Contact() {
 
   const contactMutation = useMutation({
     mutationFn: async (data: InsertContact) => {
-      const response = await apiRequest('POST', '/api/contacts', data);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Failed to submit form' }));
-        throw new Error(errorData.message || 'Failed to submit form');
-      }
-      return response.json();
+      const { error } = await supabase.from('contacts').insert(data);
+      if (error) throw new Error(error.message || 'Failed to submit form');
+      return data;
     },
     onSuccess: () => {
       toast({

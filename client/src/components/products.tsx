@@ -5,15 +5,23 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCartStore, type CartItem } from '@/lib/store';
 import { useToast } from '@/hooks/use-toast';
-import type { ProductWithVariants, ProductVariant } from '@/shared/schema';
+import type { ProductWithVariants, ProductVariant } from '@shared/schema';
 import { useState } from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Image } from '@/components/ui/image';
+import { supabase } from '@/lib/supabaseClient';
 
 export function Products() {
-  const { data: productsData, isLoading } = useQuery<ProductWithVariants[]>({
-    queryKey: ['/api/products'],
+  const { data: productsData, isLoading, error } = useQuery<ProductWithVariants[]>({
+    queryKey: ['products'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*, variants:product_variants(*)');
+      if (error) throw new Error(error.message);
+      return data as ProductWithVariants[];
+    },
   });
 
   const addItemToCart = useCartStore((state) => state.addItem);

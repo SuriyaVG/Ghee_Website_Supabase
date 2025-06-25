@@ -1,1 +1,16 @@
-node_modules
+# Dependencies
+/node_modules
+/client/node_modules
+
+# Build artifacts
+/dist
+/client/dist
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDE and OS files
+.DS_Store
+.vscode/
