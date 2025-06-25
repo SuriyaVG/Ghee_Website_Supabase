@@ -5,17 +5,17 @@ import { persist } from 'zustand/middleware';
 
 // New CartItem definition
 export interface CartItem {
-  id: string; // Composite key: `productId-variantId`
-  productId: number;
-  name: string; // Product name
+  id: string;
+  productId: string;
+  name: string;
   variant: {
-    id: number;
+    id: string;
     size: string;
-    price: number; // Store as number
+    price: number;
     image_url: string;
   };
   quantity: number;
-  price: number; // Price of this specific variant at the time of adding to cart
+  price: number;
 }
 
 interface CartStore {

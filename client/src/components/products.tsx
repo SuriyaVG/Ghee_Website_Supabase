@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCartStore, type CartItem } from '@/lib/store';
 import { useToast } from '@/hooks/use-toast';
-import type { ProductWithVariants, ProductVariant } from '@shared/schema';
+import type { ProductWithVariants, ProductVariant } from '@shared/schemas/products';
 import { useState } from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -17,8 +17,8 @@ export function Products() {
     queryKey: ['products'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('products')
-        .select('*, variants:product_variants(*)');
+        .from('products_with_variants')
+        .select('*');
       if (error) throw new Error(error.message);
       return data as ProductWithVariants[];
     },
@@ -27,13 +27,13 @@ export function Products() {
   const addItemToCart = useCartStore((state) => state.addItem);
   const { toast } = useToast();
 
-  const [selectedVariants, setSelectedVariants] = useState<Record<number, number | undefined>>({});
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string | undefined>>({});
 
-  const handleVariantChange = (productId: number, variantId: number) => {
+  const handleVariantChange = (productId: string, variantId: string) => {
     setSelectedVariants((prev) => ({ ...prev, [productId]: variantId }));
   };
 
-  const handleAddToCart = (product: ProductWithVariants, variantId?: number) => {
+  const handleAddToCart = (product: ProductWithVariants, variantId?: string) => {
     if (!variantId) {
       toast({
         title: 'Select a size',
@@ -157,8 +157,8 @@ export function Products() {
                         Select Size:
                       </Label>
                       <RadioGroup
-                        defaultValue={currentSelectedVariantId?.toString()}
-                        onValueChange={(value) => handleVariantChange(product.id, parseInt(value))}
+                        defaultValue={currentSelectedVariantId}
+                        onValueChange={(value) => handleVariantChange(product.id, value)}
                         className="flex space-x-3"
                       >
                         {product.variants.map((variant) => (
@@ -173,7 +173,7 @@ export function Products() {
                                         }`}
                           >
                             <RadioGroupItem
-                              value={variant.id.toString()}
+                              value={variant.id}
                               id={`variant-${product.id}-${variant.id}`}
                               className="sr-only"
                             />
