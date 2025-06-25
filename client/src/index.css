@@ -187,4 +187,8 @@
   .hover\:text-pouch-gold:hover {
     color: hsl(var(--pouch-gold));
   }
+  
+  .bg-background {
+    background-color: hsl(var(--background));
+  }
 }
