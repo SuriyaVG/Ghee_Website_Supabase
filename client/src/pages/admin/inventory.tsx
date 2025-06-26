@@ -42,25 +42,38 @@ export default function AdminInventoryPage() {
       }));
     },
   });
-  const [editStock, setEditStock] = useState<Record<number, number>>({});
+  const [editStock, setEditStock] = useState<Record<number, { value: number; loading: boolean }>>({});
 
   const updateStockMutation = useMutation({
-    mutationFn: async ({ productId, variantId, stock_quantity }: { productId: number; variantId: number; stock_quantity: number }) => {
+    mutationFn: async ({ variantId, stock_quantity }: { variantId: number; stock_quantity: number }) => {
       const { error } = await supabase
         .from('product_variants')
         .update({ stock_quantity })
         .eq('id', variantId);
-      if (error) {
-        throw new Error(error.message || 'Failed to update stock');
-      }
-      return { productId, variantId, stock_quantity };
+      if (error) throw new Error(error.message || 'Failed to update stock');
+      return { variantId, stock_quantity };
     },
-    onSuccess: () => {
+    onMutate: ({ variantId }) => {
+      setEditStock((prev) => ({
+        ...prev,
+        [variantId]: { ...prev[variantId], loading: true },
+      }));
+    },
+    onSuccess: (data) => {
       toast({ title: 'Stock updated', description: 'Inventory updated successfully.' });
-      refetch();
+      setEditStock((prev) => {
+        const newEditStock = { ...prev };
+        delete newEditStock[data.variantId];
+        return newEditStock;
+      });
+      queryClient.invalidateQueries({ queryKey: ['products-with-variants'] });
     },
-    onError: (err: any) => {
+    onError: (err: any, variables) => {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      setEditStock((prev) => ({
+        ...prev,
+        [variables.variantId]: { ...prev[variables.variantId], loading: false },
+      }));
     },
   });
 
@@ -92,8 +105,15 @@ export default function AdminInventoryPage() {
                   <Input
                     type="number"
                     min={0}
-                    value={editStock[variant.id] ?? variant.stock_quantity ?? 0}
-                    onChange={(e) => setEditStock((prev) => ({ ...prev, [variant.id]: parseInt(e.target.value, 10) }))}
+                    value={editStock[variant.id]?.value ?? variant.stock_quantity ?? 0}
+                    disabled={editStock[variant.id]?.loading}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value, 10) || 0;
+                      setEditStock((prev) => ({
+                        ...prev,
+                        [variant.id]: { ...(prev[variant.id] || { loading: false }), value },
+                      }));
+                    }}
                     className="w-24"
                   />
                 </td>
@@ -101,15 +121,17 @@ export default function AdminInventoryPage() {
                   <Button
                     size="sm"
                     onClick={() => {
-                      updateStockMutation.mutate({
-                        productId: product.id,
-                        variantId: variant.id,
-                        stock_quantity: editStock[variant.id] ?? variant.stock_quantity ?? 0,
-                      });
+                      const newStock = editStock[variant.id]?.value;
+                      if (newStock !== undefined && newStock !== variant.stock_quantity) {
+                        updateStockMutation.mutate({
+                          variantId: variant.id,
+                          stock_quantity: newStock,
+                        });
+                      }
                     }}
-                    disabled={updateStockMutation.isPending}
+                    disabled={editStock[variant.id]?.loading || editStock[variant.id]?.value === undefined}
                   >
-                    Save
+                    {editStock[variant.id]?.loading ? 'Saving...' : 'Save'}
                   </Button>
                 </td>
               </tr>
