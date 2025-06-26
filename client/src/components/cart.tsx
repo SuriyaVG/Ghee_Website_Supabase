@@ -30,9 +30,9 @@ export function Cart({ isOpen, onClose }: CartProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleQuantityChange = (productId: number, newQuantity: number) => {
+  const handleQuantityChange = (cartItemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
-    updateQuantity(productId, newQuantity);
+    updateQuantity(cartItemId, newQuantity);
   };
 
   const handleCheckout = () => {

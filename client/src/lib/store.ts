@@ -5,7 +5,7 @@ import { persist } from 'zustand/middleware';
 
 // New CartItem definition
 export interface CartItem {
-  id: number;
+  id: string;
   productId: number;
   name: string;
   variant: {
@@ -21,8 +21,8 @@ export interface CartItem {
 interface CartStore {
   items: CartItem[];
   addItem: (itemDetails: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
-  removeItem: (cartItemId: number) => void; // Use composite ID
-  updateQuantity: (cartItemId: number, quantity: number) => void; // Use composite ID
+  removeItem: (cartItemId: string) => void; // Use composite ID
+  updateQuantity: (cartItemId: string, quantity: number) => void; // Use composite ID
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
@@ -52,13 +52,13 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      removeItem: (cartItemId: number) => {
+      removeItem: (cartItemId: string) => {
         set((state) => ({
           items: state.items.filter((item) => item.id !== cartItemId),
         }));
       },
 
-      updateQuantity: (cartItemId: number, quantity: number) => {
+      updateQuantity: (cartItemId: string, quantity: number) => {
         if (quantity <= 0) {
           get().removeItem(cartItemId);
           return;
@@ -91,7 +91,7 @@ export const useCartStore = create<CartStore>()(
 export function isValidCartItem(item: any): item is CartItem {
   return (
     typeof item === "object" &&
-    typeof item.id === "number" &&
+    typeof item.id === "string" &&
     typeof item.name === "string" &&
     typeof item.price === "number" &&
     typeof item.quantity === "number" &&
