@@ -79,19 +79,34 @@ export default function AdminOrdersPage() {
     }
     setLoading(true);
     setError('');
+
     const fetchOrders = async () => {
       try {
-        const { data, error } = await supabase
+        // Correctly fetch orders and their related items
+        const { data: rawOrders, error } = await supabase
           .from('orders')
-          .select('*')
+          .select('*, order_items(*)')
           .order('created_at', { ascending: false })
           .limit(50);
 
         if (error) {
-          setError(error.message || 'Failed to fetch orders');
-        } else {
-          setOrders(data || []);
+          throw new Error(error.message || 'Failed to fetch orders');
         }
+
+        // Manually map the snake_case data to the camelCase interface
+        const formattedOrders: Order[] = (rawOrders || []).map((order: any) => ({
+          id: order.id,
+          customerName: order.customer_name,
+          phoneNumber: order.customer_phone,
+          paymentMethod: order.payment_status, // Mapping payment_status to paymentMethod
+          totalAmount: order.total,
+          createdAt: order.created_at,
+          status: order.status,
+          items: order.order_items || [], // Ensure items is always an array
+        }));
+
+        setOrders(formattedOrders);
+
       } catch (err: any) {
         setError(err.message || 'Failed to fetch orders');
       } finally {
@@ -100,7 +115,7 @@ export default function AdminOrdersPage() {
     };
 
     fetchOrders();
-  }, [isLoggedIn, token, authLoading]);
+  }, [isLoggedIn, token, authLoading, navigateRouter]);
 
   const handleLogout = () => {
     logout();
