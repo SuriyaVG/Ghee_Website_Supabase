@@ -5,6 +5,8 @@ export const productVariantSchema = z.object({
   size: z.string(),
   price: z.number(),
   image_url: z.string(),
+  sku: z.string().optional(),
+  stock_quantity: z.number().optional(),
 });
 
 export const productSchema = z.object({
@@ -17,4 +19,4 @@ export const productSchema = z.object({
 
 export type ProductVariant = z.infer<typeof productVariantSchema>;
 export type Product = z.infer<typeof productSchema>;
-export type ProductWithVariants = Product; 
+export type ProductWithVariants = Product;

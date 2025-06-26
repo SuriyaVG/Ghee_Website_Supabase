@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useZodForm } from '@/hooks/use-zod-form';
-import { insertContactSchema, type InsertContact } from '../../shared/schema';
+import { insertContactSchema, type InsertContact } from '../../shared/schemas/contacts.ts';
 import { supabase } from '@/lib/supabaseClient';
 
 export function Contact() {

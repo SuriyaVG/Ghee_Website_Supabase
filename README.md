@@ -84,7 +84,10 @@ All backend logic has been migrated from the previous Express server to Supabase
 ## Troubleshooting
 
 ### Vercel Build Failures
-If you encounter build failures on Vercel related to module resolution (e.g., ENOENT: no such file or directory), ensure that all non-component TypeScript imports (like schemas, types, or helpers) include the .ts file extension. Vercel's build environment is stricter about this than a local dev server. For example, `import { mySchema } from './schemas/mySchema'` should be `import { mySchema } from './schemas/mySchema.ts'`.
+If you encounter build failures on Vercel related to module resolution (e.g., `ENOENT: no such file or directory` or `Rollup failed to resolve import`), check for these two common issues:
+
+1.  **Missing File Extensions:** Ensure that all non-component TypeScript imports (like schemas, types, or helpers) include the `.ts` file extension. Vercel's build environment is stricter about this than a local dev server. For example, `import { mySchema } from './schemas/mySchema'` should be `import { mySchema } from './schemas/mySchema.ts'`.
+2.  **Server-Side Code in Client Bundle:** Do not import server-side packages (like `drizzle-orm`) into files that are part of the client-side Vite build. The `client` directory and its children should only contain code intended to run in the browser. Shared types and Zod schemas are fine, but database table definitions are not.
 
 ---
 

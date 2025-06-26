@@ -5,11 +5,11 @@ import { persist } from 'zustand/middleware';
 
 // New CartItem definition
 export interface CartItem {
-  id: string;
-  productId: string;
+  id: number;
+  productId: number;
   name: string;
   variant: {
-    id: string;
+    id: number;
     size: string;
     price: number;
     image_url: string;
@@ -21,8 +21,8 @@ export interface CartItem {
 interface CartStore {
   items: CartItem[];
   addItem: (itemDetails: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
-  removeItem: (cartItemId: string) => void; // Use composite ID
-  updateQuantity: (cartItemId: string, quantity: number) => void; // Use composite ID
+  removeItem: (cartItemId: number) => void; // Use composite ID
+  updateQuantity: (cartItemId: number, quantity: number) => void; // Use composite ID
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
@@ -52,13 +52,13 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      removeItem: (cartItemId: string) => {
+      removeItem: (cartItemId: number) => {
         set((state) => ({
           items: state.items.filter((item) => item.id !== cartItemId),
         }));
       },
 
-      updateQuantity: (cartItemId: string, quantity: number) => {
+      updateQuantity: (cartItemId: number, quantity: number) => {
         if (quantity <= 0) {
           get().removeItem(cartItemId);
           return;
@@ -91,7 +91,7 @@ export const useCartStore = create<CartStore>()(
 export function isValidCartItem(item: any): item is CartItem {
   return (
     typeof item === "object" &&
-    typeof item.id === "string" &&
+    typeof item.id === "number" &&
     typeof item.name === "string" &&
     typeof item.price === "number" &&
     typeof item.quantity === "number" &&

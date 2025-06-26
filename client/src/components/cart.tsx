@@ -9,9 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useCartStore } from '@/lib/store';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
 import { Payment } from './payment';
-import type { InsertOrder } from '@shared/schema';
+import type { InsertOrder } from '../../shared/schemas/orders.ts';
 
 interface CartProps {
   isOpen: boolean;

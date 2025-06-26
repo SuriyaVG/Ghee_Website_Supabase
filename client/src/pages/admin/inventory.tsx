@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import type { ProductWithVariants, ProductVariant } from '@shared/schema';
+import type { ProductWithVariants, ProductVariant } from '../../../shared/schemas/products.ts';
 import { useNavigate, Link } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { supabase } from '@/lib/supabaseClient';
@@ -82,7 +82,7 @@ export default function AdminInventoryPage() {
         </thead>
         <tbody>
           {products?.flatMap((product) =>
-            product.variants.map((variant) => (
+            product.variants.map((variant: ProductVariant) => (
               <tr key={variant.id} className="border-b last:border-b-0">
                 <td className="p-2">{product.name}</td>
                 <td className="p-2">{variant.sku || '-'}</td>
@@ -107,7 +107,7 @@ export default function AdminInventoryPage() {
                         stock_quantity: editStock[variant.id] ?? variant.stock_quantity ?? 0,
                       });
                     }}
-                    disabled={updateStockMutation.isLoading}
+                    disabled={updateStockMutation.isPending}
                   >
                     Save
                   </Button>
@@ -119,4 +119,4 @@ export default function AdminInventoryPage() {
       </table>
     </AdminLayout>
   );
-} 
+}
