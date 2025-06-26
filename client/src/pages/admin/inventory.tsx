@@ -50,29 +50,31 @@ export default function AdminInventoryPage() {
         .from('product_variants')
         .update({ stock_quantity })
         .eq('id', variantId);
-      if (error) throw new Error(error.message || 'Failed to update stock');
+      if (error) {
+        throw new Error(error.message || 'Failed to update stock');
+      }
       return { variantId, stock_quantity };
     },
     onMutate: ({ variantId }) => {
       setEditStock((prev) => ({
         ...prev,
-        [variantId]: { ...prev[variantId], loading: true },
+        [variantId]: { ...(prev[variantId] || { value: 0, loading: false }), loading: true },
       }));
     },
     onSuccess: (data) => {
       toast({ title: 'Stock updated', description: 'Inventory updated successfully.' });
-      setEditStock((prev) => {
-        const newEditStock = { ...prev };
-        delete newEditStock[data.variantId];
-        return newEditStock;
-      });
       queryClient.invalidateQueries({ queryKey: ['products-with-variants'] });
+      setEditStock((prev) => {
+        const newState = { ...prev };
+        delete newState[data.variantId];
+        return newState;
+      });
     },
     onError: (err: any, variables) => {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
       setEditStock((prev) => ({
         ...prev,
-        [variables.variantId]: { ...prev[variables.variantId], loading: false },
+        [variables.variantId]: { ...(prev[variables.variantId] || { value: 0 }), loading: false },
       }));
     },
   });
@@ -122,14 +124,14 @@ export default function AdminInventoryPage() {
                     size="sm"
                     onClick={() => {
                       const newStock = editStock[variant.id]?.value;
-                      if (newStock !== undefined && newStock !== variant.stock_quantity) {
+                      if (newStock !== undefined && newStock !== (variant.stock_quantity ?? 0)) {
                         updateStockMutation.mutate({
                           variantId: variant.id,
                           stock_quantity: newStock,
                         });
                       }
                     }}
-                    disabled={editStock[variant.id]?.loading || editStock[variant.id]?.value === undefined}
+                    disabled={editStock[variant.id]?.loading || editStock[variant.id]?.value === undefined || editStock[variant.id]?.value === (variant.stock_quantity ?? 0)}
                   >
                     {editStock[variant.id]?.loading ? 'Saving...' : 'Save'}
                   </Button>
