@@ -79,22 +79,27 @@ export default function AdminOrdersPage() {
     }
     setLoading(true);
     setError('');
-    supabase
-      .from('orders')
-      .select('*')
-      .order('createdAt', { ascending: false })
-      .limit(50)
-      .then(({ data, error }) => {
+    const fetchOrders = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
         if (error) {
           setError(error.message || 'Failed to fetch orders');
         } else {
           setOrders(data || []);
         }
-      })
-      .catch((err) => {
+      } catch (err: any) {
         setError(err.message || 'Failed to fetch orders');
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
   }, [isLoggedIn, token, authLoading]);
 
   const handleLogout = () => {
@@ -214,4 +219,4 @@ export default function AdminOrdersPage() {
       </div>
     </AdminLayout>
   );
-} 
+}
