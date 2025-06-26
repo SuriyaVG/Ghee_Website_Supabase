@@ -81,6 +81,11 @@ All backend logic has been migrated from the previous Express server to Supabase
 - **Authentication:** Admin login (/admin) is handled by Supabase Auth (supabase.auth.signInWithPassword).
 - **Secure Operations:** Actions requiring secrets or server-side validation (e.g., online payment verification, stock management) must be implemented as Supabase Edge Functions.
 
+## Troubleshooting
+
+### Vercel Build Failures
+If you encounter build failures on Vercel related to module resolution (e.g., ENOENT: no such file or directory), ensure that all non-component TypeScript imports (like schemas, types, or helpers) include the .ts file extension. Vercel's build environment is stricter about this than a local dev server. For example, `import { mySchema } from './schemas/mySchema'` should be `import { mySchema } from './schemas/mySchema.ts'`.
+
 ---
 
-If needed, create new .md files like `architecture.md` or `changelog.md` for further documentation. 
+If needed, create new .md files like `architecture.md` or `changelog.md` for further documentation.

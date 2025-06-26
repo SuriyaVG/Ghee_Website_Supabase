@@ -7,9 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import type { InsertContact } from '@shared/schema';
 import { useZodForm } from '@/hooks/use-zod-form';
-import { insertContactSchema } from '@shared/schemas/contacts';
+import { insertContactSchema, type InsertContact } from '../../shared/schema';
 import { supabase } from '@/lib/supabaseClient';
 
 export function Contact() {

@@ -1,11 +1,11 @@
-export * from './contacts';
-export * from './orders';
-export * from './products';
-export * from './reviews';
+export * from './contacts.ts';
+export * from './orders.ts';
+export * from './products.ts';
+export * from './reviews.ts';
 
 import { relations } from 'drizzle-orm';
-import { products, productVariants } from './products';
-import { orders, orderItems } from './orders';
+import { products, productVariants } from '../../../migrations/schema.ts';
+import { orders, orderItems } from '../../../migrations/schema.ts';
 
 export const productRelations = relations(products, ({ many }) => ({
   variants: many(productVariants),
@@ -31,4 +31,4 @@ export const orderItemRelations = relations(orderItems, ({ one }) => ({
     fields: [orderItems.product_id],
     references: [productVariants.id],
   }),
-})); 
+}));
