@@ -38,14 +38,18 @@ export default function AdminInventoryPage() {
       // Transform data to match ProductWithVariants[]
       return (data || []).map((product: any) => ({
         ...product,
-        variants: product.product_variants || [],
+        id: String(product.id), // Convert product ID to string
+        variants: (product.product_variants || []).map((variant: any) => ({
+          ...variant,
+          id: String(variant.id), // Convert variant ID to string
+        })),
       }));
     },
   });
-  const [editStock, setEditStock] = useState<Record<number, { value: number; loading: boolean }>>({});
+  const [editStock, setEditStock] = useState<Record<string, { value: number; loading: boolean }>>({}); // Changed key type to string
 
   const updateStockMutation = useMutation({
-    mutationFn: async ({ variantId, stock_quantity }: { variantId: number; stock_quantity: number }) => {
+    mutationFn: async ({ variantId, stock_quantity }: { variantId: string; stock_quantity: number }) => { // Changed variantId type to string
       const { error } = await supabase
         .from('product_variants')
         .update({ stock_quantity })

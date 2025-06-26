@@ -6,10 +6,10 @@ import { persist } from 'zustand/middleware';
 // New CartItem definition
 export interface CartItem {
   id: string;
-  productId: number;
+  productId: string;
   name: string;
   variant: {
-    id: number;
+    id: string;
     size: string;
     price: number;
     image_url: string;

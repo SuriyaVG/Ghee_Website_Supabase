@@ -1,19 +1,19 @@
 import { z } from 'zod';
 
 export const productVariantSchema = z.object({
-  id: z.number(),
+  id: z.string(), // Changed from z.number() to z.string()
   size: z.string(),
-  price: z.number(),
+  price: z.string(),
   image_url: z.string(),
   sku: z.string().optional(),
   stock_quantity: z.number().optional(),
+  best_value_badge: z.string().optional(), // Added best_value_badge
 });
 
 export const productSchema = z.object({
-  id: z.number(),
+  id: z.string(), // Changed from z.number() to z.string()
   name: z.string(),
   description: z.string(),
-  image_url: z.string(),
   variants: z.array(productVariantSchema),
 });
 

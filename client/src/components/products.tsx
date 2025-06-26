@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCartStore, type CartItem } from '@/lib/store';
 import { useToast } from '@/hooks/use-toast';
-import type { ProductWithVariants, ProductVariant } from '@shared/schemas/products';
+import type { ProductWithVariants, ProductVariant } from '../../shared/schemas/products.ts';
 import { useState } from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -29,7 +29,17 @@ export function Products() {
       
       console.log('Supabase query successful. Raw data received:', data);
 
-      return data as ProductWithVariants[];
+      // Ensure IDs are strings as per schema
+      const processedData = data?.map(product => ({
+        ...product,
+        id: String(product.id),
+        variants: product.variants.map((variant: ProductVariant) => ({
+          ...variant,
+          id: String(variant.id),
+        }))
+      })) as ProductWithVariants[];
+
+      return processedData;
     },
   });
 
@@ -51,7 +61,7 @@ export function Products() {
       });
       return;
     }
-    const selectedVariant = product.variants.find((v) => v.id === variantId);
+    const selectedVariant = product.variants.find((v: ProductVariant) => v.id === variantId);
     if (!selectedVariant) return;
 
     const cartItem: CartItem = {
@@ -127,13 +137,13 @@ export function Products() {
               const currentSelectedVariantId =
                 selectedVariants[product.id] || product.variants[0].id;
 
-              const currentVariant = product.variants.find((v) => v.id === currentSelectedVariantId) || product.variants[0];
+              const currentVariant = product.variants.find((v: ProductVariant) => v.id === currentSelectedVariantId) || product.variants[0];
 
               const displayImage =
                 (currentVariant?.image_url?.replace(/\.jpg$/, '.webp') ||
                 '/placeholder-image.webp');
               
-              const displayPrice = currentVariant?.price ? parseFloat(currentVariant.price as any).toFixed(2) : '0.00';
+              const displayPrice = currentVariant?.price ? parseFloat(currentVariant.price).toFixed(2) : '0.00';
 
               return (
                 <Card
@@ -174,7 +184,7 @@ export function Products() {
                           onValueChange={(value) => handleVariantChange(product.id, value)}
                           className="flex space-x-3"
                         >
-                          {product.variants.map((variant) => (
+                          {product.variants.map((variant: ProductVariant) => (
                             <Label
                               key={variant.id}
                               htmlFor={`variant-${product.id}-${variant.id}`}
