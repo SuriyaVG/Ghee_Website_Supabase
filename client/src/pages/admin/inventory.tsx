@@ -50,20 +50,19 @@ export default function AdminInventoryPage() {
         .from('product_variants')
         .update({ stock_quantity })
         .eq('id', variantId);
-      if (error) {
-        throw new Error(error.message || 'Failed to update stock');
-      }
+      if (error) throw new Error(error.message || 'Failed to update stock');
       return { variantId, stock_quantity };
     },
     onMutate: ({ variantId }) => {
       setEditStock((prev) => ({
         ...prev,
-        [variantId]: { ...(prev[variantId] || { value: 0, loading: false }), loading: true },
+        [variantId]: { ...(prev[variantId] || { value: 0 }), loading: true },
       }));
     },
     onSuccess: (data) => {
       toast({ title: 'Stock updated', description: 'Inventory updated successfully.' });
       queryClient.invalidateQueries({ queryKey: ['products-with-variants'] });
+      // Clear the editing state for the specific row after success
       setEditStock((prev) => {
         const newState = { ...prev };
         delete newState[data.variantId];
@@ -131,7 +130,11 @@ export default function AdminInventoryPage() {
                         });
                       }
                     }}
-                    disabled={editStock[variant.id]?.loading || editStock[variant.id]?.value === undefined || editStock[variant.id]?.value === (variant.stock_quantity ?? 0)}
+                    disabled={
+                      editStock[variant.id]?.loading ||
+                      editStock[variant.id]?.value === undefined ||
+                      editStock[variant.id]?.value === (variant.stock_quantity ?? 0)
+                    }
                   >
                     {editStock[variant.id]?.loading ? 'Saving...' : 'Save'}
                   </Button>
