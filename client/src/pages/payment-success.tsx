@@ -103,8 +103,8 @@ export default function PaymentSuccessPage() {
         <h1 className="text-2xl font-bold mb-2">Order Placed Successfully!</h1>
         <div className="text-muted-foreground mb-6 text-left bg-card p-4 rounded-lg">
           <p><strong>Order ID:</strong> #{order.id}</p>
-          <p><strong>Name:</strong> {order.customerName}</p>
-          <p><strong>Phone:</strong> {order.customerPhone}</p>
+          <p><strong>Name:</strong> {order.customer_name}</p>
+          <p><strong>Phone:</strong> {order.customer_phone}</p>
           <p><strong>Total:</strong> ₹{order.total}</p>
           <p><strong>Payment Method:</strong> Cash on Delivery</p>
           <p className="mt-2">Your order will be delivered in 3–5 business days.</p>
