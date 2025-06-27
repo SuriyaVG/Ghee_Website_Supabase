@@ -19,6 +19,10 @@ interface PaymentProps {
   onCancel: () => void;
 }
 
+function isValidUUID(uuid: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(uuid);
+}
+
 export function Payment({ items, total, customerInfo, onSuccess, onCancel }: PaymentProps) {
   const validItems = items.filter(isValidCartItem);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -52,29 +56,47 @@ export function Payment({ items, total, customerInfo, onSuccess, onCancel }: Pay
         throw new Error('Please enter a valid Indian phone number starting with 6-9 and having 10 digits.');
       }
 
-      const { data, error } = await supabase.rpc('create_order', {
-        payload: {
-          customername: customerInfo.customerName,
-          customeremail: customerInfo.customerEmail,
-          customerphone: phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`,
-          totalprice: total,
-          items: validItems.map(item => ({
-            product_id: item.variant.id,
-            product_name: item.name,
-            quantity: item.quantity,
-            price_per_item: item.price,
-          })),
-        },
-      });
-
-      if (error) {
-        console.error("Error placing order:", error.message);
-        throw error;
+      if (validItems.length === 0) {
+        setCodError("Cart is empty. Please add items before placing an order.");
+        return;
       }
 
-      const newOrderId = data;
-      window.location.href = `/payment-success?orderId=${newOrderId}`;
+      const items = validItems.map(item => ({
+        product_id: item.variant.id,
+        product_name: item.name,
+        quantity: item.quantity,
+        price_per_item: item.price,
+      }));
+      // Validate all product_id values
+      for (const item of items) {
+        if (typeof item.product_id !== 'string' || !isValidUUID(item.product_id)) {
+          throw new Error(`Invalid product_id for item: ${item.product_name}. Must be a valid UUID string.`);
+        }
+      }
+      console.log("Items being passed:", items);
 
+      const payload = {
+        customername: customerInfo.customerName,
+        customeremail: customerInfo.customerEmail,
+        customerphone: phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`,
+        totalprice: total,
+        items,
+      };
+
+      console.log("Payload being sent to Supabase:", { payload });
+
+      supabase.rpc('create_order', { payload })
+        .then(res => {
+          if (res.error) {
+            setCodError(res.error.message || 'Unable to place order. Please try again.');
+            return;
+          }
+          const newOrderId = res.data;
+          window.location.href = `/payment-success?orderId=${newOrderId}`;
+        })
+        .catch(err => {
+          setCodError(err?.message || 'Unable to place order. Please try again.');
+        });
     } catch (error: any) {
       setCodError(error?.message || 'Unable to place order. Please try again.');
     }
