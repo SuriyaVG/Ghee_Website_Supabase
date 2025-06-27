@@ -64,12 +64,15 @@ export function Payment({ items, total, customerInfo, onSuccess, onCancel }: Pay
             quantity: item.quantity,
             price_per_item: item.price,
           })),
-        }
+        },
       });
-      if (error) throw error;
-      const newOrderId = data;
 
-      setCodOrderId(newOrderId);
+      if (error) {
+        console.error("Error placing order:", error.message);
+        throw error;
+      }
+
+      const newOrderId = data;
       window.location.href = `/payment-success?orderId=${newOrderId}`;
 
     } catch (error: any) {
