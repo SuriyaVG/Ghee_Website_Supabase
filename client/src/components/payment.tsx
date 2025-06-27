@@ -56,10 +56,10 @@ export function Payment({ items, total, customerInfo, onSuccess, onCancel }: Pay
       }
 
       const rpcPayload = {
-        customer_name: customerInfo.customerName,
-        customer_email: customerInfo.customerEmail,
-        customer_phone: phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`,
-        total_price: total,
+        customername: customerInfo.customerName,
+        customeremail: customerInfo.customerEmail,
+        customerphone: phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`,
+        totalprice: total,
         items: validItems.map(item => ({
           product_id: item.variant.id,
           product_name: item.name,
