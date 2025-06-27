@@ -61,31 +61,29 @@ export function Payment({ items, total, customerInfo, onSuccess, onCancel }: Pay
         return;
       }
 
-      const items = validItems.map(item => ({
+      console.log("Items being passed:", JSON.stringify(validItems.map(item => ({
         product_id: item.variant.id,
         product_name: item.name,
         quantity: item.quantity,
         price_per_item: item.price,
-      }));
-      // Validate all product_id values
-      for (const item of items) {
-        if (typeof item.product_id !== 'string' || !isValidUUID(item.product_id)) {
-          throw new Error(`Invalid product_id for item: ${item.product_name}. Must be a valid UUID string.`);
-        }
-      }
-      console.log("Items being passed:", items);
+      })), null, 2));
 
-      const payload = {
+      const rpcPayload = {
         customername: customerInfo.customerName,
         customeremail: customerInfo.customerEmail,
         customerphone: phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`,
         totalprice: total,
-        items,
+        items: validItems.map(item => ({
+          product_id: item.variant.id,
+          product_name: item.name,
+          quantity: item.quantity,
+          price_per_item: item.price,
+        })),
       };
 
-      console.log("Payload being sent to Supabase:", { payload });
+      console.log("Payload being sent to Supabase:", JSON.stringify({ payload: rpcPayload }, null, 2));
 
-      supabase.rpc('create_order', { payload })
+      supabase.rpc('create_order', { payload: rpcPayload })
         .then(res => {
           if (res.error) {
             setCodError(res.error.message || 'Unable to place order. Please try again.');
