@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CreditCard, Shield, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,6 +30,7 @@ export function Payment({ items, total, customerInfo, onSuccess, onCancel }: Pay
   const [codError, setCodError] = useState<string | null>(null);
   const [codOrderId, setCodOrderId] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
+  const queryClient = useQueryClient();
 
   const createOrderMutation = useMutation({
     mutationFn: async (rpcPayload) => {
@@ -84,12 +85,13 @@ export function Payment({ items, total, customerInfo, onSuccess, onCancel }: Pay
       console.log("Payload being sent to Supabase:", JSON.stringify({ payload: rpcPayload }, null, 2));
 
       supabase.rpc('create_order', { payload: rpcPayload })
-        .then(res => {
+        .then(async res => {
           if (res.error) {
             setCodError(res.error.message || 'Unable to place order. Please try again.');
             return;
           }
           const newOrderId = res.data;
+          await queryClient.invalidateQueries({ queryKey: ['orders'] });
           window.location.href = `/payment-success?orderId=${newOrderId}`;
         })
         .catch(err => {
