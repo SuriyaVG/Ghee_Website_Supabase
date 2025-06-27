@@ -52,20 +52,22 @@ export function Payment({ items, total, customerInfo, onSuccess, onCancel }: Pay
         throw new Error('Please enter a valid Indian phone number starting with 6-9 and having 10 digits.');
       }
 
-      const rpcPayload = {
-        customername: customerInfo.customerName,
-        customeremail: customerInfo.customerEmail,
-        customerphone: phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`,
-        totalprice: total,
-        items: validItems.map(item => ({
-          product_id: item.variant.id,
-          product_name: item.name,
-          quantity: item.quantity,
-          price_per_item: item.price,
-        })),
-      };
-
-      const newOrderId = await createOrderMutation.mutateAsync(rpcPayload);
+      const { data, error } = await supabase.rpc('create_order', {
+        payload: {
+          customername: customerInfo.customerName,
+          customeremail: customerInfo.customerEmail,
+          customerphone: phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`,
+          totalprice: total,
+          items: validItems.map(item => ({
+            product_id: item.variant.id,
+            product_name: item.name,
+            quantity: item.quantity,
+            price_per_item: item.price,
+          })),
+        }
+      });
+      if (error) throw error;
+      const newOrderId = data;
 
       setCodOrderId(newOrderId);
       window.location.href = `/payment-success?orderId=${newOrderId}`;
