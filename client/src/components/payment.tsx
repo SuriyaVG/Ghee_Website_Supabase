@@ -56,16 +56,18 @@ export function Payment({ items, total, customerInfo, onSuccess, onCancel }: Pay
       }
 
       const rpcPayload = {
-        p_customer_name: customerInfo.customerName,
-        p_customer_email: customerInfo.customerEmail,
-        p_customer_phone: phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`,
-        p_total: total,
-        p_items: validItems.map(item => ({
-          product_id: item.variant.id,
-          product_name: item.name,
-          quantity: item.quantity,
-          price_per_item: item.price,
-        })),
+        order_data: {
+          p_customer_name: customerInfo.customerName,
+          p_customer_email: customerInfo.customerEmail,
+          p_customer_phone: phoneNumber.startsWith('91') ? phoneNumber : `91${phoneNumber}`,
+          p_total: total,
+          p_items: validItems.map(item => ({
+            product_id: item.variant.id,
+            product_name: item.name,
+            quantity: item.quantity,
+            price_per_item: item.price,
+          })),
+        }
       };
 
       const newOrderId = await createOrderMutation.mutateAsync(rpcPayload);
