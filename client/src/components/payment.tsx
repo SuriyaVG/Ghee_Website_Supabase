@@ -28,12 +28,9 @@ export function Payment({ items, total, customerInfo, onSuccess, onCancel }: Pay
   const [isRetrying, setIsRetrying] = useState(false);
 
   const createOrderMutation = useMutation({
-    mutationFn: async (orderData: any) => {
-      const { data, error } = await supabase.rpc('create_order', orderData);
-      
-      if (error) {
-        throw new Error(error.message || 'Failed to create order via RPC');
-      }
+    mutationFn: async (rpcPayload) => {
+      const { data, error } = await supabase.rpc('create_order', { payload: rpcPayload });
+      if (error) throw error;
       return data;
     },
   });
